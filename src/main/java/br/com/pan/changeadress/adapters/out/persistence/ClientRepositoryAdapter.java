@@ -38,13 +38,13 @@ public class ClientRepositoryAdapter implements ClientRepositoryPort {
         domain.setNome(entity.getNome());
         if (entity.getAddress() != null) {
             domain.setAddress(new AddressDomain());
-            domain.getAddress().setCep(entity.getAddress().getCep());
-            domain.getAddress().setLogradouro(entity.getAddress().getLogradouro());
-            domain.getAddress().setNumero(entity.getAddress().getNumero());
-            domain.getAddress().setComplemento(entity.getAddress().getComplemento());
-            domain.getAddress().setBairro(entity.getAddress().getBairro());
-            domain.getAddress().setCidade(entity.getAddress().getCidade());
-            domain.getAddress().setEstado(entity.getAddress().getEstado());
+            domain.getAddress().setZipCode(entity.getAddress().getCep());
+            domain.getAddress().setStreet(entity.getAddress().getLogradouro());
+            domain.getAddress().setNumber(entity.getAddress().getNumero());
+            domain.getAddress().setComplement(entity.getAddress().getComplemento());
+            domain.getAddress().setNeighborhood(entity.getAddress().getBairro());
+            domain.getAddress().setCity(entity.getAddress().getCidade());
+            domain.getAddress().setState(entity.getAddress().getEstado());
         }
         return domain;
     }
@@ -58,13 +58,13 @@ public class ClientRepositoryAdapter implements ClientRepositoryPort {
 
         if (domain.getAddress() != null) {
             var addressEntity = new AddressEntity();
-            addressEntity.setCep(domain.getAddress().getCep());
-            addressEntity.setLogradouro(domain.getAddress().getLogradouro());
-            addressEntity.setNumero(domain.getAddress().getNumero());
-            addressEntity.setComplemento(domain.getAddress().getComplemento());
-            addressEntity.setBairro(domain.getAddress().getBairro());
-            addressEntity.setCidade(domain.getAddress().getCidade());
-            addressEntity.setEstado(domain.getAddress().getEstado());
+            addressEntity.setCep(domain.getAddress().getZipCode());
+            addressEntity.setLogradouro(domain.getAddress().getStreet());
+            addressEntity.setNumero(domain.getAddress().getNumber());
+            addressEntity.setComplemento(domain.getAddress().getComplement());
+            addressEntity.setBairro(domain.getAddress().getNeighborhood());
+            addressEntity.setCidade(domain.getAddress().getCity());
+            addressEntity.setEstado(domain.getAddress().getState());
             addressEntity.setCliente(entity);
             entity.setAddress(addressEntity);
         }
