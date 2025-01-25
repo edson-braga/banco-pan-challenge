@@ -1,16 +1,15 @@
 package br.com.pan.changeadress.adapters.out.persistence.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "endereco")
 public class AddressEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String cep;
     private String logradouro;
     private String numero;
     private String complemento;
@@ -18,12 +17,24 @@ public class AddressEntity {
     private String cidade;
     private String estado;
 
+    @OneToOne
+    @JoinColumn(name = "cliente_cpf", referencedColumnName = "cpf")
+    private ClientEntity cliente;
+
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCep() {
+        return cep;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
     }
 
     public String getLogradouro() {
@@ -72,5 +83,13 @@ public class AddressEntity {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public ClientEntity getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(ClientEntity cliente) {
+        this.cliente = cliente;
     }
 }

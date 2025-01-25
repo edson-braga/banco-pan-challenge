@@ -6,6 +6,15 @@ public class ClientDomain {
     private String nome;
     private AddressDomain address;
 
+    public ClientDomain() {
+    }
+
+    public ClientDomain(String cpf, String nome, AddressDomain address) {
+        this.cpf = cpf;
+        this.nome = nome;
+        this.address = address;
+    }
+
     public String getCpf() {
         return cpf;
     }

@@ -3,14 +3,14 @@ package br.com.pan.changeadress.adapters.out.persistence.entities;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "cliente")
 public class ClientEntity {
 
     @Id
     private String cpf;
     private String nome;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "endereco_id", referencedColumnName = "id")
+    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
     private AddressEntity address;
 
     public String getCpf() {

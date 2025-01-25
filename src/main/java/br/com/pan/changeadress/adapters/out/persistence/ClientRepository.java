@@ -1,6 +1,8 @@
 package br.com.pan.changeadress.adapters.out.persistence;
 
-import br.com.pan.changeadress.domain.ClientDomain;
+import br.com.pan.changeadress.adapters.out.persistence.entities.ClientEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ClientRepository extends JpaRepository<ClientDomain, Integer> {}
+@Repository
+public interface ClientRepository extends JpaRepository<ClientEntity, String> {}
