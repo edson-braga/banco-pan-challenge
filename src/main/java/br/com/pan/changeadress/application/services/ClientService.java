@@ -21,11 +21,10 @@ public class ClientService implements ClientServicePort {
     }
 
     @Override
-    public ClientDomain updateClientByCpf(String cpf, AddressDomain newData) {
+    public ClientDomain updateClientByCpf(String cpf, AddressDomain newAddress) {
         ClientDomain clientDomain = clientRepository.findClientByCpf(cpf);
         if (clientDomain != null) {
-            clientDomain.setAddress(newData);
-            return clientRepository.updateClientByCpf(cpf, clientDomain);
+            return clientRepository.updateClientByCpf(cpf, new ClientDomain(clientDomain.cpf(), clientDomain.nome(), newAddress));
         }
         return null;
     }
