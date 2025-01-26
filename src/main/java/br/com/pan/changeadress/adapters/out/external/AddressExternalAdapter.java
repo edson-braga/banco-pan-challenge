@@ -2,15 +2,12 @@ package br.com.pan.changeadress.adapters.out.external;
 
 import br.com.pan.changeadress.application.ports.out.AddressExternalPort;
 import br.com.pan.changeadress.domain.AddressDomain;
+import br.com.pan.changeadress.domain.exceptions.AddressNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
 public class AddressExternalAdapter implements AddressExternalPort {
@@ -23,67 +20,83 @@ public class AddressExternalAdapter implements AddressExternalPort {
     @Value("${external.api.ibge}")
     private String ibgeBaseUrl;
 
+    private static final Comparator<String> STATE_COMPARATOR = Comparator
+            // Define prioridade para São Paulo (0) e Rio de Janeiro (1), demais (2)
+            .comparingInt((String s) -> switch (s.toLowerCase()) {
+                case "são paulo"      -> 0;
+                case "rio de janeiro" -> 1;
+                default -> 2;
+            })
+            // Depois ordena alfabeticamente ignorando maiúsculas/minúsculas
+            .thenComparing(String::compareToIgnoreCase);
+
     public AddressExternalAdapter(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
+
     @Override
     public AddressDomain fetchAddressByZipCode(String zipCode) {
-        String url = viaCepBaseUrl + "/" + zipCode + "/json/";
-        Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+        var url = viaCepBaseUrl + "/" + zipCode + "/json/";
+        var response = getForObject(url);
 
-        if (response == null) {
-            return null;
+        if (response.isEmpty() || hasError(response)) {
+            throw new AddressNotFoundException(
+                    "Address not found for ZIP code: " + zipCode,
+                    "ADDRESS_NOT_FOUND"
+            );
         }
 
-        AddressDomain address = new AddressDomain();
-        address.setZipCode((String) response.get("cep"));
-        address.setStreet((String) response.get("logradouro"));
-        address.setNeighborhood((String) response.get("bairro"));
-        address.setCity((String) response.get("localidade"));
-        address.setState((String) response.get("uf"));
-        return address;
+        var map = response.get();
+        return new AddressDomain(
+                (String) map.get("cep"),
+                (String) map.get("logradouro"),
+                (String) map.get("bairro"),
+                (String) map.get("localidade"),
+                (String) map.get("uf"));
+    }
+
+    private boolean hasError(Optional<Map<String, Object>> response) {
+        return response.orElse(Collections.emptyMap()).containsKey("erro");
     }
 
     @Override
     public List<String> fetchStates() {
         var url = ibgeBaseUrl + "/estados";
-        // O restTemplate retorna um array de Maps; transformamos em List via List.of(...)
-        var statesArray = restTemplate.getForObject(url, Map[].class);
-        if (statesArray == null) return List.of();
+        var responseArray = getForObjectArray(url);
 
-        var states = List.of(statesArray); // Java 9+ (List.of) ou Arrays.asList(...)
-
-        // Extrai apenas o campo "nome"
-        var stateNames = states.stream()
-                .map(e -> (String) e.get("nome"))
-                .toList(); // toList() do Java 16+ (retorna List imutável)
-
-        // Ordenamos com base em:
-        //   1) São Paulo (0)
-        //   2) Rio de Janeiro (1)
-        //   3) Demais estados (2), e então ordem alfabética
-        var customComparator = Comparator
-                .comparingInt((String s) -> switch (s.toLowerCase()) {
-                    case "são paulo"      -> 0;
-                    case "rio de janeiro" -> 1;
-                    default -> 2;
-                })
-                .thenComparing(String::compareToIgnoreCase);
+        var stateNames = responseArray
+                .map(List::of)
+                .orElseGet(List::of)
+                .stream()
+                .map(m -> (String) m.get("nome"))
+                .toList();
 
         return stateNames.stream()
-                .sorted(customComparator)
+                .sorted(STATE_COMPARATOR)
                 .toList();
     }
 
     @Override
     public List<String> fetchMunicipalities(String stateId) {
-        String url = ibgeBaseUrl + "/estados/" + stateId + "/municipios";
-        List<Map<String, Object>> municipalities = Arrays.asList(
-                restTemplate.getForObject(url, Map[].class)
-        );
+        var url = String.format("%s/estados/%s/municipios", ibgeBaseUrl, stateId);
+        var responseArray = getForObjectArray(url);
 
-        return municipalities.stream()
+        // Converte o array em lista, extrai "nome", converte para lista imutável
+        return responseArray
+                .map(List::of)
+                .orElseGet(List::of)
+                .stream()
                 .map(m -> (String) m.get("nome"))
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    private Optional<Map<String, Object>> getForObject(String url) {
+        var response = restTemplate.getForObject(url, Map.class);
+        return Optional.ofNullable(response);
+    }
+
+    private Optional<Map<String, Object>[]> getForObjectArray(String url) {
+        var response = restTemplate.getForObject(url, Map[].class);
+        return Optional.ofNullable(response);
     }
 }
