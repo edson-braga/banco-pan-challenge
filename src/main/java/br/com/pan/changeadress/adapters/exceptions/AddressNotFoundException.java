@@ -1,4 +1,4 @@
-package br.com.pan.changeadress.domain.exceptions;
+package br.com.pan.changeadress.adapters.exceptions;
 
 public class AddressNotFoundException extends RuntimeException {
 

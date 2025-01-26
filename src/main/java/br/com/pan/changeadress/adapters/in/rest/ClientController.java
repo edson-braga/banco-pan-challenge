@@ -15,13 +15,13 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @GetMapping("/{cpf}")
-    public ClientDomain consultarCliente(@PathVariable String cpf) {
-        return clientService.findClientByCpf(cpf);
+    @GetMapping("/{socialId}")
+    public ClientDomain findClientBySocialId(@PathVariable String socialId) {
+        return clientService.findClientBySocialId(socialId);
     }
 
-    @PutMapping("/{cpf}/endereco")
-    public ClientDomain alterarEndereco(@PathVariable String cpf, @RequestBody AddressDomain newData) {
-        return clientService.updateClientByCpf(cpf, newData);
+    @PutMapping("/{socialId}/endereco")
+    public ClientDomain changeAddress(@PathVariable String socialId, @RequestBody AddressDomain newData) {
+        return clientService.updateClientBySocialId(socialId, newData);
     }
 }

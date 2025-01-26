@@ -4,6 +4,6 @@ import br.com.pan.changeadress.domain.AddressDomain;
 import br.com.pan.changeadress.domain.ClientDomain;
 
 public interface ClientServicePort {
-    ClientDomain findClientByCpf(String cpf);
-    ClientDomain updateClientByCpf(String cpf, AddressDomain address);
+    ClientDomain findClientBySocialId(String cpf);
+    ClientDomain updateClientBySocialId(String cpf, AddressDomain address);
 }

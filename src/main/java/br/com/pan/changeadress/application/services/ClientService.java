@@ -16,15 +16,15 @@ public class ClientService implements ClientServicePort {
     }
 
     @Override
-    public ClientDomain findClientByCpf(String cpf) {
+    public ClientDomain findClientBySocialId(String cpf) {
         return clientRepository.findClientByCpf(cpf);
     }
 
     @Override
-    public ClientDomain updateClientByCpf(String cpf, AddressDomain newAddress) {
+    public ClientDomain updateClientBySocialId(String cpf, AddressDomain newAddress) {
         ClientDomain clientDomain = clientRepository.findClientByCpf(cpf);
         if (clientDomain != null) {
-            return clientRepository.updateClientByCpf(cpf, new ClientDomain(clientDomain.cpf(), clientDomain.nome(), newAddress));
+            return clientRepository.updateClientByCpf(cpf, new ClientDomain(clientDomain.socialId(), clientDomain.name(), newAddress));
         }
         return null;
     }
