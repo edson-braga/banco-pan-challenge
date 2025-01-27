@@ -58,7 +58,7 @@ Antes de tudo certifique-se de que tem instalado tanto o **Java** na versão **2
 Maven: [Download Apache Maven – Maven](https://maven.apache.org/download.cgi)
 Java: [Java Downloads | Oracle](https://www.oracle.com/java/technologies/downloads/)
 
-Primeiro passo descompactar o arquivo zip recebido e navegar até a pasta onde foi descompactado o arquivo do projeto, utilizando o terminal do seu sistema operacional.
+Realize o clone do projeto a partir deste repositório: https://github.com/edson-braga/banco-pan-challenge.git
 
 ## Comandos para compilar 
 
