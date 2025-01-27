@@ -36,7 +36,7 @@
     </appender>
 
     <!-- Define o nível de log para toda a aplicação como INFO -->
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="JSON_CONSOLE" />
     </root>
 </configuration>
