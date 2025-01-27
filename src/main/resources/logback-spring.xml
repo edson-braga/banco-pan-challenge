@@ -1,0 +1,42 @@
+<configuration>
+    <!--
+       Define o appender para console, gerando logs em formato JSON.
+       Também inclui campos como nível de log, timestamp, logger, thread, stack trace, etc.
+    -->
+    <appender name="JSON_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <!-- Timestamp no padrão UTC -->
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+
+                <!-- Versão do log (opcional) -->
+                <version />
+
+                <!-- Lida com nível de log, logger, thread, etc. -->
+                <pattern>
+                    <pattern>{
+                        "log.level": "%level",
+                        "logger": "%logger{36}",
+                        "thread": "%thread"
+                        }</pattern>
+                </pattern>
+
+                <!-- Mensagem do log -->
+                <message />
+
+                <!-- Adiciona context info (por exemplo, MDC) -->
+                <logstashMarkers />
+
+                <!-- Inclui o stack trace em caso de erro -->
+                <stackTrace />
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Define o nível de log para toda a aplicação como INFO -->
+    <root level="INFO">
+        <appender-ref ref="JSON_CONSOLE" />
+    </root>
+</configuration>
