@@ -1,0 +1,233 @@
+openapi: 3.0.3
+info:
+  title: "Change Address API"
+  version: "1.0"
+  description: "API to update client registration data (generated example)."
+
+servers:
+  - url: http://localhost:8080
+    description: "Local server"
+tags:
+  - name: find client
+  - name: change address
+  - name: address information
+
+paths:
+  /clientes/{socialId}:
+    get:
+      tags:
+        - find client
+      summary: "Retrieves a client by Social ID (e.g., CPF)."
+      description: "Returns the data of a specific client, including address."
+      operationId: findClientBySocialId
+      parameters:
+        - name: socialId
+          in: path
+          required: true
+          description: "Client identifier"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Client found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDomain'
+        '404':
+          description: "Client found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - change address
+      summary: "Changes a specific client's address."
+      description: "Updates the client's address with the provided data."
+      operationId: changeAddress
+      parameters:
+        - name: socialId
+          in: path
+          required: true
+          description: "Client identifier"
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: "New address data"
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddressDomain'
+      responses:
+        '200':
+          description: "Address updated"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientDomain'
+        '404':
+          description: "Client not found or update error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /enderecos/{zipCode}:
+    get:
+      tags:
+        - address information
+      summary: "Fetch an address by zipCode."
+      description: "Calls the address service by zipCode and returns the data."
+      operationId: getAddressByZipCode
+      parameters:
+        - name: zipCode
+          in: path
+          required: true
+          description: "Postal code (Brazilian or other) for the address"
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "Address found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddressDomain'
+        '404':
+          description: "Address not found"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /enderecos/estados:
+    get:
+      tags:
+        - address information
+      summary: "Lists all states."
+      description: "Returns a list of strings with the name (or abbreviation) of the states."
+      operationId: getStates
+      responses:
+        '200':
+          description: "List of states"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /enderecos/estados/{stateId}/municipios:
+    get:
+      tags:
+        - address information
+      summary: "Lists the municipalities of a state."
+      description: "Returns the list of municipalities according to the state ID."
+      operationId: getMunicipalitiesByState
+      parameters:
+        - name: stateId
+          in: path
+          required: true
+          description: "State identifier (e.g., 35 for São Paulo)."
+          schema:
+            type: string
+      responses:
+        '200':
+          description: "List of municipalities"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '404':
+          description: "No municipalities found or invalid state"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ClientDomain:
+      type: object
+      properties:
+        cpf:
+          type: string
+          example: "12345678901"
+          description: "CPF or unique client identifier"
+        nome:
+          type: string
+          example: "João Silva"
+          description: "Client name"
+        address:
+          $ref: '#/components/schemas/AddressDomain'
+      required:
+        - cpf
+        - nome
+
+    AddressDomain:
+      type: object
+      properties:
+        zipCode:
+          type: string
+          example: "01001-000"
+          description: "Postal code of the address"
+        street:
+          type: string
+          example: "Praça da Sé"
+          description: "Street"
+        number:
+          type: string
+          example: "123"
+          description: "Number"
+        complement:
+          type: string
+          example: "Apt 101"
+          description: "Complement (optional)"
+        neighborhood:
+          type: string
+          example: "Sé"
+          description: "Neighborhood"
+        city:
+          type: string
+          example: "São Paulo"
+          description: "City"
+        state:
+          type: string
+          example: "SP"
+          description: "State (UF) or region"
+      required:
+        - zipCode
+        - street
+        - city
+        - state
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "CLIENT_NOT_FOUND"
+          description: "Error code"
+        message:
+          type: string
+          example: "Error trying to retrieve client"
+          description: "Error message"
+
+
+
